@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Scaling & loadbalancing</title>
+</head>
+
+<header style="background: linear-gradient(300deg, #ff4c8e, #042befe3, #1f011f03);">
+    
+    <img src="../shahpic1.jpg" style="float:left;margin-right:0.5rem; height: 70px; width: 60px; border-radius: 50%; text-align: right; font-size: xx-small; border: none; margin: 1em; margin: 0.5em;" alt="Author">
+    <div>Shahzad Aslam <span style="float:right;margin-right:0.5rem">GitHub:   saslam-stack (github.com)</span>
+        <br>
+        
+         AWS Certified Solution Architect Associate <span style="float:right;margin-right:0.5rem">Email: saslam79@hotmail.co.uk</span> <br> AWS Certified Cloud Practitioner <span style="float:right;margin-right:0.5rem">linkedin.com/in/shahzad-aslam-556719190</span><br> HTML, CSS and JavaScript  web development 
+          
+        </div>
+       
+
+    
+</header>
+
+
+<body>
+    <h1>Auto Scaling and Load Balancing AWS Architecture</h1>
+    <hr>
+    <p>Elastic Load Balancing (ELB) and Amazon EC2 Auto Scaling to load balance 
+        and automatically scale your AWS infrastructure. 
+        <br>
+        <br>
+        ELB automatically distributes incoming application traffic across multiple 
+        Amazon Elastic Compute Cloud (Amazon EC2) instances. ELB provides the 
+        amount of load balancing capacity needed to route application traffic to 
+        help you achieve fault tolerance in your applications. 
+        <br>
+        <br>
+        Auto Scaling help to maintain application availability and give you the 
+        ability to scale your Amazon EC2 capacity out or in automatically 
+        according to conditions that you define. You can use auto scaling to help 
+        ensure that you are running your desired number of EC2 instances. Auto 
+        scaling can also automatically increase the number of EC2 instances during 
+        spikes in demand to maintain performance and can decrease capacity during 
+        lulls to reduce costs. Auto scaling is well suited to applications that 
+        have stable demand patterns or that experience hourly, daily, or weekly 
+        variability in usage.
+    </p>
+    <h2>Task 1: Creating an AMI for auto scaling</h2>
+
+    <p>In this task, you create an AMI from the existing Web Server 1. This 
+        action saves the contents of the boot disk so that new instances can be 
+        launched with identical content. On the AWS Management Console, in the 
+        Search bar, enter and choose EC2 to open the Amazon EC2 Management 
+        Console. 
+    </p>
+    <img src="./Images/Pic1.png" alt="AWS Management Console Screenshot">
+
+    <p>In the left navigation pane, locate the Instances section, and choose 
+        Instances. 
+    </p>
+    <img src="./Images/pic2.png" alt="AWS Management Console Screenshot">
+    <p>The Test webserver instance is listed. You now create an AMI based on this 
+        instance. Choose the Test webserver instance, which should appear in a 
+        Running state. From the Actions dropdown list, choose Image and templates 
+        > Create image, 
+    </p>
+    <img src="./Images/pic3.png" alt="AWS Management Console Screenshot">
+    <p>and then configure the following options: For Image name, enter Web Server 
+        AMI. For Image description - optional, enter Test AMI for Web Server . 
+        Choose Create image 
+    </p>
+    <img src="./Images/pic4.png" alt="AWS Management Console Screenshot">
+    <p>The confirmation screen displays the AMI ID for your new AMI. You use this 
+        AMI when launching the Auto Scaling group later in the lab. 
+    </p>
+    <img src="./Images/pic5.png" alt="AWS Management Console Screenshot">
+    <h2>Task 2: Creating a load balancer </h2>
+
+    <p>In this task, you create a load balancer that can balance traffic across 
+        multiple EC2 instances and Availability Zones. In the left navigation 
+        pane, locate the Load Balancing section, and choose Load Balancers. 
+    </p>
+    <img src="./Images/pic6.png" alt="AWS Management Console Screenshot">
+    <p>Choose create load balancer. In the Load balancer types section, for 
+        Application Load Balancer, choose Create. 
+    </p>
+    <img src="./Images/pic7.png" alt="AWS Management Console Screenshot">
+    <p>On the Create Application Load Balancer page, in the Basic configuration 
+        section, configure the following option: For the Load balancer name, enter 
+        LabELB.  Scheme default setting i.e. internet facing, IP address type: 
+        IPV4. 
+    </p>
+    <img src="./Images/pic8.png" alt="AWS Management Console Screenshot">
+    <p>In the Network mapping section, configure the following options: For VPC, 
+        choose Lab VPC. For Mappings, choose both Availability Zones listed. For 
+        the first Availability Zone, choose Public Subnet 1. For the second 
+        Availability Zone, choose Public Subnet 2. 
+    </p>
+    <img src="./Images/pic9.png" alt="AWS Management Console Screenshot">
+    <p>These options configure the load balancer to operate across multiple 
+        Availability Zones. In the Security groups section, choose the X for the 
+        default security group to remove it. From the Security groups dropdown 
+        list, choose Web Security Group. The Web Security Group has already been 
+        created for you, which permits HTTP access. In the Listeners and routing 
+        section, choose the Create target group link.
+    </p>
+    <img src="./Images/pic10.png" alt="AWS Management Console Screenshot">
+    <p>Note: This link opens a new browser tab with the Create target group 
+        configuration options. On the new Target groups browser tab, in the Basic 
+        configuration section, configure the following: For Choose a target type, 
+        choose Instances. For Target group name, enter lab-target-group . At the 
+        bottom of the page, choose Next. 
+    </p>
+    <img src="./Images/pic11.png" alt="AWS Management Console Screenshot">
+    <p>On the Register targets page, choose Create target group. Once the target 
+        group has been created successfully, close the Target groups browser tab. 
+    </p>
+    <img src="./Images/pic12.png" alt="AWS Management Console Screenshot">
+    <p>Return to the Load balancers browser tab. In the Listeners and routing 
+        section, choose Refresh to the right of the Forward to dropdown list for 
+        Default action. 
+        From the Forward to dropdown list, choose lab-target-group. 
+    </p>
+    <img src="./Images/pic13.png" alt="AWS Management Console Screenshot">
+    <p>At the bottom of the page, choose Create load balancer. You should receive 
+        a message similar to the following: Successfully created load balancer: 
+        LabELB . To view the LabELB load balancer that you created, choose View 
+        load balancer. 
+    </p>
+    <img src="./Images/pic14.png" alt="">
+    <h2>Task 3: Creating a launch template </h2>
+    <p>In this task, you create a launch template for your Auto Scaling group. A 
+        launch template is a template that an Auto Scaling group uses to launch 
+        EC2 instances. When you create a launch template, you specify information 
+        for the instances, such as the AMI, instance type, key pair, security 
+        group, and disks. 
+        <br>
+        At the top of the AWS Management Console, in the search bar, enter and 
+        choose EC2. In the left navigation pane, locate the Instances section, and 
+        choose Launch Templates. Choose Create launch template.
+    </p>
+    <img src="./Images/pic15.png" alt="AWS Management Console Screenshot">
+    <p>On the Create launch template page, in the Launch template name and 
+        description section, configure the following options: For Launch template 
+        name - required, enter lab-app-launch-template. For Template version 
+        description, enter A web server for the load test app. For Auto Scaling 
+        guidance, choose Provide guidance to help me set up a template that I can 
+        use with EC2 Auto Scaling. 
+    </p>
+    <img src="./Images/pic16.png" alt="AWS Management Console Screenshot">
+    <p>In the Application and OS Images (Amazon Machine Image) - required 
+        section, choose the My AMIs tab. Notice that Web Server AMI is already 
+        chosen. 
+    </p>
+    <img src="./Images/pic17.png" alt="AWS Management Console Screenshot">
+    <p>In the Instance type section, choose the Instance type dropdown list, and 
+        choose t3.micro. In the Key pair (login) section, confirm that the Key 
+        pair name dropdown list is set to Don't include in launch template if you 
+        do not need to connect to instances or choose a key pair if you need to 
+        connect to an instance. 
+    </p>
+    <img src="./Images/pic18.png" alt="AWS Management Console Screenshot">
+    <p>In the Network settings section, choose the Security groups dropdown list, 
+        and choose Web Security Group. When you launch an instance, you can pass 
+        user data to         the         instance.
+    </p>
+    <img src="./Images/pic19.png" alt="AWS Management Console Screenshot">
+    <p>Choose Create launch template. You should receive a message similar to the 
+        following: Successfully created lab-app-launch-template. 
+    </p>
+    <img src="./Images/pic20.png" alt="AWS Management Console Screenshot">
+    <p>Choose View launch templates.
+
+    </p>
+    <h2>Task 4: Creating an Auto Scaling group </h2>
+    <p>In this task, you use your launch template to create an Auto Scaling 
+        group. Choose lab-app-launch-template.
+    </p>
+    <img src="./Images/pic21.png" alt="AWS Management Console Screenshot">
+    <p>From the Action dropdown list, choose Create Auto Scaling group 
+
+    </p>
+    <img src="./Images/pic22.png" alt="AWS Management Console Screenshot">
+    <p>On the Choose launch template or configuration page, in the Name section, 
+        for Auto Scaling group name, enter Lab Auto Scaling Group. Choose Next. On 
+        the Choose instance launch options page, in the Network section, configure 
+        the following options: From the VPC dropdown list, choose Lab VPC.
+        br 
+        From the Availability Zones and subnets dropdown list, choose Private 
+        Subnet 1 (10.0.1.0/24) and Private Subnet 2 (10.0.3.0/24). Choose Next. 
+    </p>
+    <img src="./Images/pic24.png" alt="AWS Management Console Screenshot">
+    <p>On the Configure advanced options – optional page, configure the following 
+        options: In the Load balancing – optional section, choose Attach to an 
+        existing load balancer. In the Attach to an existing load balancer 
+        section, configure the following options: Choose Choose from your load 
+        balancer target groups. From the Existing load balancer target groups 
+        dropdown list, choose lab-target-group | HTTP. 
+    </p>
+    <img src="./Images/pic25.png" alt="AWS Management Console Screenshot">
+    <p>In the Health checks – optional section, for Health check type, choose 
+        ELB. Choose Next 
+    </p>
+    <img src="./Images/pic26.png" alt="AWS Management Console Screenshot">
+    <p>On the Configure group size and scaling policies – optional page, 
+        configure the following options:  In the Group size – optional section, 
+        enter the following values: Desired capacity:2 , Minimum capacity: 2 , 
+        Maximum capacity: 4. 
+    </p>
+    <img src="./Images/pic27.png" alt="AWS Management Console Screenshot">
+    <p>In the Scaling policies – optional section, configure the following 
+        options: Choose Target tracking scaling policy. For Metric type, choose 
+        Average CPU utilization. Change the Target value to 50 . This change tells 
+        Auto Scaling to maintain an average CPU utilization across all instances 
+        of 50 percent. Auto Scaling automatically adds or removes capacity. as 
+        required to keep the metric at or close to the specified target value. It 
+        adjusts to fluctuations in the metric due to a fluctuating load pattern. 
+    </p>
+    <img src="./Images/pic28.png" alt="AWS Management Console Screenshot">
+    <p>Choose Next. On the Add notifications – optional page, choose Next. On the 
+        Add tags – optional page, choose Add tag and configure the following 
+        options: Key: Enter Name . Value - optional: Enter Lab Instance . Choose 
+        Next. Choose Create Auto Scaling group. These options launch EC2 instances 
+        in private subnets across both Availability Zones. 
+    </p>
+    <img src="./Images/pic29.png" alt="AWS Management Console Screenshot">
+    <p>Your Auto Scaling group initially shows an Instances count of zero, but 
+        new instances will be launched to reach the desired count of two 
+        instances. 
+    </p>
+    <img src="./Images/pic30.png" alt="AWS Management Console Screenshot">
+    <h2>Terminating the Test Server instance </h2>
+    <p>In this task, you terminate the Test Server instance. This instance was 
+        used to create the AMI that your Auto Scaling group used, but this 
+        instance is no longer needed. Choose Test Server , and ensure that it is 
+        the only instance selected. From the Instance state  dropdown menu, 
+        choose Terminate instance. Choose Terminate.
+    </p>
+    <img src="./Images/pic31.png" alt="AWS Management Console Screenshot">
+    <hr>
+
+
+    <footer style="background: linear-gradient(300deg, #ff4c8e, #042befe3, #1f011f03);">@2024 all rights reserved</footer>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

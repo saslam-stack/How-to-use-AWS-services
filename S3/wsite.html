@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>S3 website</title>
+</head>
+<header style="background: linear-gradient(300deg, #ff4c8e, #042befe3, #08df5a98);">
+    
+    <img src="../shahpic1.jpg" style="float:left;margin-right:0.5rem; height: 70px; width: 60px; border-radius: 50%; text-align: right; font-size: xx-small; border: none; margin: 1em; margin: 0.5em;" alt="Author">
+    <div>Shahzad Aslam <span style="float:right;margin-right:0.5rem">GitHub:   saslam-stack (github.com)</span>
+        <br>
+        
+         AWS Certified Solution Architect Associate <span style="float:right;margin-right:0.5rem">Email: saslam79@hotmail.co.uk</span> <br> AWS Certified Cloud Practitioner <span style="float:right;margin-right:0.5rem">linkedin.com/in/shahzad-aslam-556719190</span><br> HTML, CSS and JavaScript  web development 
+          
+        </div>
+       
+
+    
+</header>
+<hr>
+
+<body>
+    <h1>Creating a Website on AWS S3</h1>
+    <hr>
+    <p><b>Below steps, explain process of creating a public website on S3</b>.
+        <ol>
+            <li>Launch EC2 instance.</li>
+            <li>Install session manager agent on EC2.</li>
+            <li>Create an Amazon Simple Storage Service (Amazon S3) bucket.</li>
+            <li>Create a new AWS Identity and Access Management (IAM) user that has full access to the 
+        Amazon S3 service & upload files to Amazon S3 to host a simple website.</li>
+    </ol>
+    </p>
+    <p><b> Please see below AWS documention for guidance on how to launch an AWS linux EC2 instance and install session manager agent.</b>
+    </p>
+    
+    <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html" target="_blank">Get started with Amazon EC2</a>
+    <br>
+    <a href="https://docs.aws.amazon.com/systems-manager/latest/userguide/manually-install-ssm-agent-linux.html" target="_blank">Manually installing and uninstalling SSM Agent on EC2 instances for Linux</a>
+    <br>
+    <p>After launching AWS EC2 instance and installing session manager agent you need to Connect to Amazon Linux EC2 instance using SSM.
+        
+    </p>
+
+    <H2>Connect to an Amazon Linux EC2 instance using SSM:</H2>
+    <p>Click on services in AWS management console and choose EC2. Click on 
+        running instance and tick box next to your EC2 instance and click connect.
+    </p>
+    <img src="./Image/Pic1.png" alt="AWS management console screenshot">
+    <p>Click session manager and connect. </p>
+    <img src="./Image/Pic2.png" alt="AWS management console screenshot">
+    <p>A console connection has made to the instance inside your web browser 
+        window using ssm-user, a prompt is displayed. 
+    </p>
+    <img src="./Image/pic3.png" alt="PuTTY screenshot">
+    <p>Run the following commands to change the user and home directory: 
+        <br> 
+        <br>
+        sudo su -l ec2-user 
+        <br>
+        pwd 
+    </p>
+    <img src="./Image/pic4.png" alt="PuTTY screenshot">
+    <h2>Configure the AWS CLI:</h2>
+    <p>You need to create access key and secret key. Keys can be created through 
+        IAM for a user.  Click on create access key-use case AWS CLI. Make sure to 
+        download as CSV file.
+    </p>
+    <img src="./Image/pic5.png" alt="AWS management console screenshot">
+    <p>You would need access key and secret key to for AWS CLI configuration.
+
+    </p>
+    <p>In the SSH session terminal window, run the configure command:
+        <br>
+        <br> 
+        aws configure 
+    </p>
+    <p>At the prompt, configure the following: AWS Access Key ID: Copy and paste 
+        the value for AccessKey from pane in the left, into the terminal 
+        window.AWS Secret Access Key: Copy and paste the value for SecretKey from 
+        pane in the left, into the terminal window.Default region name: Enter  
+        your AWS region e.g. us-west-2 , Default output format: Enter json 
+    </p>
+    <img src="./Image/pic6.png" alt="AWS management console screenshot">
+    <h2>Create an S3 bucket using the AWS CLI:</h2>
+    <p>To create a bucket in Amazon S3, you use the aws s3api create-bucket 
+        command. When you use this command to create an S3 bucket, you also 
+        include the following: Specify --region us-west-2 , Add --create-bucket
+        configuration LocationConstraint=us-west-2 to the end of the command.
+        <br> 
+        <br>
+        The following is an example of the command to create a new S3 bucket. You 
+        can use mypublicbucket47 as your bucket name, or you can replace 
+        <mypublicbucket47> with a bucket name that you prefer to use for this lab.  
+            <br>
+            <br>
+        aws s3api create-bucket --bucket mypublicbucket47 --region us-west-2 -
+        create-bucket-configuration LocationConstraint=us-west-2 
+        <br>
+        <br>
+        If the command is successful, you will get a JSON-formatted response with 
+        a Location name-value pair, where the value reflects the bucket name. e.g. 
+        "Location": "http://mypublicbucket47.s3.amazonaws.com/" 
+    </p>
+    <br>
+    <img src="./Image/pic7.png" alt="AWS management console screenshot">
+    <p>Go back to AWS management console to see if user S3 bucket named 
+        mypublicbucket47 has been created. 
+    </p>
+    <img src="./Image/pic8.png" alt="AWS management console screenshot">
+    <h2>Create a new IAM user using AWS CLI:</h2>
+    <p>Using the AWS CLI, create a new IAM user with the command aws iam create
+        user and username awsS3user: aws iam create-user --user-name james
+    </p>
+    <img src="./Image/pic9.png" alt="PuTTY screenshot">
+    <p>Create a login profile for the new user by using the following command: 
+        aws iam create-login-profile --user-name james --password management123!
+    </p>
+    <img src="./Image/pic10.png" alt="PuTTY screenshot">
+    <p>Go back to AWS management console to see if user james has been created 
+
+    </p>
+    <img src="./Image/pic11.png" alt="">
+    <p>How to find and attach AWS managed policies to a user through AWS 
+        CLI: In the terminal window, to find the AWS managed policy for S3, run 
+        the following command: 
+        <br> 
+        <br>
+        aws iam list-policies --query "Policies[?contains(PolicyName,'S3')]" 
+    </p>
+    <img src="./Image/pic12.png" alt="">
+    <p>The result displays policies that have a PolicyName attribute containing 
+        the term S3. Locate the policy that grants full access to Amazon S3. You 
+        use this policy in the next step.
+    </p>
+    <p>To grant the awsS3user user full access to the S3 bucket, replace 
+        <policyYouFound> in following command with the appropriate PolicyName e.g. 
+        AmazonS3FullAccess from the results, and run the adjusted command:  
+        <br>
+        <br>
+        aws iam attach-user-policy --policy-arn 
+        arn:aws:iam::aws:policy/<policyYouFound> --user-name awsS3user 
+
+    </p>
+    <p>For example for to grant full s3 access use below command:
+        <br> 
+        <br>
+        aws iam attach-user-policy --policy-arn 
+        <br>
+        arn:aws:iam::aws:policy/AmazonS3FullAccess --user-name james 
+    </p>
+    <p>Go back to AWS management console to see if user james has 
+        AmazonS3FullAccess. Click on permission tab, AmazonS3FullAccess is 
+        granted.
+    </p>
+    <br>
+    <img src="./Image/pic13.png" alt="AWS management console screenshot">
+    <h2>Adjust S3 bucket permissions:</h2>
+    <p>On the AWS Management Console, on the Amazon S3 console, choose your 
+        bucket name. Go to permissions, under Block public access (bucket 
+        settings), choose Edit .DeSelect/UnSelect Block all public access. Choose 
+        Save changes (confirm on the prompt) 
+    </p>
+    <img src="./Image/pic14.png" alt="">
+    <p>On to permissions tab, under Object Ownership, choose Edit . Choose ACLs 
+        enabled . Choose I acknowledge that ACLs will be restored. Choose Save 
+        changes 
+    </p>
+    <img src="./Image/pic15.png" alt="">
+    <h2>Extract the files that you need for the website: </h2>
+    <p>I have created website contents and a file containing the static-website 
+        contents for the Amazon S3 bucket will need to be extracted.  
+        <br>
+        <br>
+        Back in the SSH terminal, extract the files that you need for this lab by 
+        running the following commands: 
+    </p>
+    <p>cd ~/sysops-activity-files 
+        tar xvzf static-website-v2.tar.gz 
+        cd static-website 
+    </p>
+    <p>To confirm that the files were extracted correctly, run the ls command. 
+        You should see a file named index.html and directories named css and image 
+    </p>
+    <img src="./Image/pic16.png" alt="PuTTY screenshot">
+    <H2>Upload files to Amazon S3 by using the AWS CLI: </H2>
+    <P>Once the files are extracted, you upload the contents of the file to 
+        Amazon S3. These files include what you explored when you ran the ls 
+        command. Once the files are extracted, you upload the contents of the file 
+        to Amazon S3. These files include what you explored when you ran the ls 
+        command.
+    </P>
+    <P>aws s3 website s3://<my-bucket>/ --index-document index.html 
+        for example above command should be like this: 
+        aws s3 website s3://mypublicbucket47/ --index-document index.html 
+    </P>
+    <P>This process helps ensure that the index.html file will be known as the 
+        index document. 
+    </P>
+    <img src="./Image/pic17.png" alt="PuTTY screenshot">
+    <p>To upload the files to the bucket, replace <my-bucket> in the following 
+        command with your bucket name, and run the adjusted command: 
+    </p>
+    <p>aws s3 cp /home/ec2-user/sysops-activity-files/static-website/ s3://<my
+        bucket>/ --recursive --acl public-read 
+    </p>
+    <p>For example above command should be like this: 
+
+    </p>
+    <p>aws s3  cp /home/ec2-user/sysops-activity-files/static-website/ 
+        s3://mypublicbucket47/ --recursive --acl public-read 
+        
+    </p>
+    <img src="./Image/pic18.png" alt="PuTTY screenshot">
+    <p>To verify that the files were uploaded, replace <my-bucket> in the 
+        following command with your bucket name, and run the adjusted command: 
+    </p>
+    <p>aws s3 ls <my-bucket>  
+        your command should look like this:  
+        aws s3 ls mypublicbucket47 
+    </p>
+    <img src="./Image/pic19.png" alt="PuTTY screenshot">
+    <p>On the AWS Management Console, on the Amazon S3 console, choose your 
+        bucket name. Choose the Properties tab. At the bottom of the this tab, 
+        note that Static website hosting is Enabled. Running the aws s3 website 
+        AWS CLI command turns on the static website hosting for an Amazon S3 
+        bucket. This option is usually turned off by default. 
+    </p>
+    <img src="./Image/pic20.png" alt="AWS management console screenshot">
+    <p>To open the URL on a new page, choose the Bucket website endpoint URL that 
+        displays. you have created a static website that is available to the 
+        public for viewing! 
+    </p>
+    <img src="./Image/pic21.png" alt="Cafe website printscreen">
+
+    <hr>
+    <br>
+
+    
+
+    
+
+
+
+  <footer style="background: linear-gradient(300deg, #ff4c8e, #042befe3, #08df5a98);">@2024 all rights reserved</footer>
+</body>
+</html>

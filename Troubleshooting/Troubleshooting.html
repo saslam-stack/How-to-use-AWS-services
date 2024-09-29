@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Troubleshooting network</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<header style="background: linear-gradient(300deg, #4cff55, #e7ef04e3, #d705db6b);">
+    
+    <img src="../shahpic1.jpg" style="float:left;margin-right:0.5rem; height: 70px; width: 60px; border-radius: 50%; text-align: right; font-size: xx-small; border: none; margin: 0.1em;" alt="Author">
+    <div>Shahzad Aslam <span style="float:right;margin-right:0.5rem">GitHub:   saslam-stack (github.com)</span>
+        <br>
+        
+         AWS Certified Solution Architect Associate <span style="float:right;margin-right:0.5rem">Email: saslam79@hotmail.co.uk</span> <br> AWS Certified Cloud Practitioner <span style="float:right;margin-right:0.5rem">linkedin.com/in/shahzad-aslam-556719190</span><br> HTML, CSS and JavaScript  web development 
+          
+        </div>
+       
+
+    
+</header>
+<hr>
+
+<body>
+    <h1>How to Troubleshoot a Network Issue</h1>
+    <hr>
+    <p> Senario: You are unable to ping an EC2 instance created through AWS CLI 
+        and you also get an error when you enter the IP address in the browser. 
+    </P>
+    <h2>Step 1:</h2>
+    <p>SSH into AWS Linux EC2 instance (Please read below article for SSH instructions).
+    </p>
+    <a href="https://saslam-stack.github.io/AWS-Linux-system-administration-/How%20to%20SSH%20AWS%20EC2/SSH%20EC2.html">How to SSH into AWS EC2 instance</a>
+    <h2>Step 2:</h2>
+    <p>Install httpd to check the status of the httpd service, enter the 
+        following systemctl command in the terminal window, and press Enter: sudo 
+        systemctl status httpd.service 
+    </p>
+    <img src="./Images/pic1.png" alt="PuTTy screenshot">
+    <p>To start the httpd service, enter the following command, and press Enter:  
+        sudo systemctl start httpd.service 
+    </p>
+    <img src="./Images/pic2.png" alt="PuTTy screenshot">
+    <p>To check the status of the httpd service again, enter the following 
+        systemctl command, and press Enter: sudo systemctl status httpd.service 
+    </p>
+    <img src="./Images/pic3.png" alt="PuTTy screenshot">
+    <p>The httpd service is now running.  You can find Public IP address on AWS management console in 
+        details section of EC2 instance: 
+    </p>
+    <img src="./Images/pic4.png" alt="AWS management console screenshot">
+    <p>Now check if webserver is working. Open a new web browser, replace with 
+        the public IP of your instance e.g. 52.41.34.77. If you are unable to load 
+        your webserver then you need to investigate the VPC and its resources. 
+        Keep the error that you received when trying to load Apache in the web 
+        browser in mind while troubleshooting this issue. 
+    </p>
+    <img src="./Images/pic5.png" alt="Web browser screenshot">
+    <p>Click on VPC in the services section of AWS management console. Use the 
+        left navigation pane and check each service within the VPC to confirm that 
+        each resource is configured correctly for example 
+        Subnets - Are the route tables associated to the correct subnets? 
+        Route Tables - Do the route tables have the correct routes? 
+        Internet Gateway - Is there an Internet Gateway and is it attached? 
+        Security Groups and network ACLs - Are the correct rules configured? 
+    </p>
+    <img src="./Images/pic6.png" alt="AWS management console Subnet screenshot">
+    <img src="./Images/pic7.png" alt="AWS management console Route table screenshot">
+    <img src="./Images/pic8.png" alt="AWS management console Internetgateway screenshot">
+    <img src="./Images/pic9.png" alt="AWS management console Security group screenshot">
+    <p>I discovered, EC2 instance security group only allows inbound traffic from 
+        SSH at port 22. Security groups. SG inbound rules needs to be amended to 
+        allow HTTP traffic at port 80. 
+    </p>
+    <img src="./Images/pic10.png" alt="AWS management console Security group screenshot">
+    <p>Try to access webserver again. Open a new web browser; enter public IP of 
+        your instance e.g. 52.41.34.77 
+    </p>
+    <img src="./Images/pic11.png" alt="Web browser screenshot">
+    <p>Apache is successfully installed and accessible. 
+
+    </p>
+    <br>
+    
+    <hr>
+    <footer style="background: linear-gradient(300deg, #4cff55, #e7ef04e3, #1f011fe2);">@2024, all rights reserved</footer>
+
+
+    
+</body>
+</html>
