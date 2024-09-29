@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>AWS RDS</title>
+</head>
+<header style="background: linear-gradient(300deg, #ff4c8e, #042befe3, #1f011f03);">
+    
+    <img src="../shahpic1.jpg" style="float:left;margin-right:0.5rem; height: 70px; width: 60px; border-radius: 50%; text-align: right; font-size: xx-small; border: none; margin: 1em; margin: 0.5em;" alt="Author">
+    <div>Shahzad Aslam <span style="float:right;margin-right:0.5rem">GitHub:   saslam-stack (github.com)</span>
+        <br>
+        
+         AWS Certified Solution Architect Associate <span style="float:right;margin-right:0.5rem">Email: saslam79@hotmail.co.uk</span> <br> AWS Certified Cloud Practitioner <span style="float:right;margin-right:0.5rem">linkedin.com/in/shahzad-aslam-556719190</span><br> HTML, CSS and JavaScript  web development 
+          
+        </div>
+       
+
+    
+</header>
+
+<body>
+    <H1>Creating an Amazon RDS instance by using the AWS CLI </H1>
+    <hr>
+    <hr>
+    <p>You can create an Amazon RDS instance by using the AWS CLI. To begin with, 
+       I have already created two EC2 instance (AWS CLI host and KKC instance) 
+       and VPC (KKC VPC). Read <a href="https://docs.aws.amazon.com/vpc/latest/userguide/create-vpc.html" target="_blank">this article</a> if need help in building a AWS VPC.
+    </p>
+    <p>CLI Host EC2 instance has the AWS CLI installed on it as part of 
+        provisioning. You can run AWS CLI commands to do the following: 
+    </p>
+    <ul>
+        <li>Configure the AWS CLI.</li>
+    </ul>
+    <p>Create the following prerequisite components required to build the Amazon RDS (relational database service) instance.
+        <ol>
+            
+        <li>A security group firewall for the Amazon RDS instance. </li>
+        <li>Two private subnets and a database subnet group. </li>
+        <li>Create the Amazon RDS Maria DB instance. </li>
+        </ol>
+
+    </p> 
+    
+    <h2>Connecting to the CLI Host instance: </h2>
+    <p>On the AWS Management Console, in the Search bar, enter and choose EC2 to 
+        open the EC2 Management Console. In the navigation pane, choose instances. 
+        From the list of instances, select the CLI Host EC2 instance. Choose 
+        Connect.
+    </p>
+    <img src="./Images/pic1.png" alt="AWS Management Console screenshot">
+    <p>On the EC2 Instance Connect tab, choose Connect. 
+
+    </p>
+    <img src="./Images/pic2.png" alt="AWS Management Console screenshot">
+    <p>SSH: If you prefer to use an SSH client to connect to the EC2 instance, 
+        read this article to <a href="https://saslam-stack.github.io/AWS-Linux-system-administration-/How%20to%20SSH%20AWS%20EC2/SSH%20EC2.html" target="_blank">Connect to Your AWS EC2 Instance</a>. Now that you are 
+        connected to the CLI Host instance, you can configure and use the AWS CLI 
+        to call AWS services. 
+    </p>
+    <H2>Configuring the AWS CLI: </H2>
+    <p>In this task, you configure the AWS CLI by providing the 
+        configuration parameters that were made available to you when the 
+        lab was provisioned. After configuration, you run AWS CLI commands 
+        to interact with AWS services. To set up the AWS CLI profile with 
+        credentials, in the EC2 Instance Connect terminal, run the following 
+        command: 
+        <br>
+        aws configure 
+    </p>
+    <p>When prompted, enter the following information: 
+
+    </p>
+    <p>AWS Access Key ID: Enter the value for AccessKey. (You can use IAM to 
+        create AccessKey and secreteKey ). <br>
+        AWS Secret Access Key: Enter the value for SecretKey. <br>
+        Default region name: Enter your AWS region e.g. us-west-2. <br>
+        Default output format: Enter json. 
+    </p>
+    <img src="./Images/pic3.png" alt="AWS EC2 connect screenshot">
+    <p>Now you are ready to run AWS CLI commands to interact with AWS services. 
+
+    </p>
+    <h2>Creating prerequisite components: </h2>
+    <p>You need create the prerequisite infrastructure components for the Amazon 
+        RDS instance. Specifically, you create the following components: 
+        <br>
+        <br>
+        KKCDatabaseSG (Security group for the Amazon RDS database) 
+        KKCDB Private Subnet 1 
+        KKCDB Private Subnet 2 
+        KKCDB Subnet Group (Database subnet group) 
+        <br>
+        <br>
+        Now, you run AWS CLI commands in the EC2 Instance Connect terminal. 
+        First, you create the KKCDatabaseSG security group. This security group is 
+        used to protect the Amazon RDS instance. It will have an inbound rule that 
+        allows only MySQL requests (using the default TCP protocol and port 3306) 
+        from instances that are associated with the KKCSecurityGroup. This rule 
+        ensures that only the KKCInstance is able to access the database. 
+        <br>
+        <br> 
+        To create the security group, run the following command. In the command, 
+        replace <KKCInstance VPC ID> with the KKCVpcID which was created as before 
+        building RDS database instance : 
+    </p>
+    <p>ws ec2 create-security-group \
+        <br>
+         --group-name KKCDatabaseSG \ 
+         <br>
+         --description "Security group for KKC database" \
+         <br>
+          --vpc-id <KKCInstance VPC ID> 
+            <br>
+            <br>
+        Final command should look like below: 
+        <br>
+        <br> 
+        aws ec2 create-security-group \ 
+        <br>
+        --group-name KKCDatabaseSG \ 
+        <br>
+        --description "Security group for KKC database" \ 
+        <br>
+        --vpc-id vpc-0d5f3e369fc1845f6 
+    </p>
+    <img src="./Images/pic4.png" alt="AWS EC2 connect screenshot">
+    <p>"GroupId": sg-0e6615ed661a7146e 
+
+    </p>
+    <p>Next, you create the inbound rule for the security group. 
+        <br>
+        <br>
+        To create the inbound rule, run the following command. In the command, 
+        replace <KKCDatabaseSG Group ID> with the GroupId value that you recorded 
+        in the previous step, and replace <KKCSecurityGroup Group ID> with the 
+        KKCSecurityGroupID value that can be found in the details section of the 
+        KKC EC2 instance: 
+    </p>
+    <p>ws ec2 authorize-security-group-ingress \ 
+        <br>
+         --group-id <KKCDatabaseSG Group ID> \ 
+        <br> 
+        --protocol tcp --port 3306 \
+        <br>
+         --source-group <KKCSecurityGroup Group ID> 
+
+    </p>
+    <p>Final command should look like below: 
+
+    </p>
+    <p>ws ec2 authorize-security-group-ingress \
+        <br>
+     --group-id sg-0e6615ed661a7146e \ 
+     <br>
+     --protocol tcp --port 3306 \ 
+     <br>
+     --source-group sg-06e2dcd4c1ee32a36 
+
+    </p>
+    <p>To confirm that the inbound rule was applied appropriately, run the 
+        following command:
+    </p>
+    <p>ws ec2 describe-security-groups \
+        <br>
+     --query "SecurityGroups[*].[GroupName,GroupId,IpPermissions]" \ 
+     <br>
+     --filters "Name=group-name,Values='KKCDatabaseSG'" 
+
+    </p>
+    <p>The output of the command should show that the KKCDatabaseSG security 
+        group now has an inbound rule that allows connections from TCP port 3306 
+        if the source of the connection is an instance that has the 
+        KKCSecurityGroup Group ID association. 
+    </p>
+    <img src="./Images/pic5.png" alt="AWS EC2 connect screenshot">
+    <p>Next, you create two private subnets and a database subnet group. First, 
+        you create KKCDB Private Subnet 1. This subnet hosts the RDS DB instance. 
+        It is a private subnet that is defined in the same Availability Zone as 
+        the KKCInstance.
+        <br>
+        <br> 
+        You must assign the subnet a Classless Inter-Domain Routing (CIDR) address 
+        block that is within the address range of the VPC but that does not 
+        overlap with the address range of any other subnet in the VPC. This reason 
+        is why you collected the information about the VPC and existing subnet 
+        CIDR blocks: 
+        <br>
+        KKC VPC IPv4 CIDR block: 10.200.0.0/20 
+        KKC Public Subnet 1 IPv4 CIDR block: 10.200.0.0/24
+        <br>
+        <br> 
+        Consider these address ranges. Can you find a suitable CIDR block for the 
+        private subnet? One possible answer is to use the address range 
+        10.200.2.0/23. 
+        <br>
+        <br>
+        To create the subnet, run the following command. In the command, replace 
+        <KKCInstance VPC ID> and <KKCInstance Availability Zone> with the values 
+        of KKCVpcID and KKCInstanceAZ, respectively, that can be found on AWS 
+        management console or using AWS CLI commands. 
+    </p>
+    <p>aws ec2 create-subnet \
+        <br>
+    --vpc-id <KKCInstance VPC ID> \ 
+        <br>
+    --cidr-block 10.200.2.0/23 \
+    <br> 
+    --availability-zone <KKCInstance Availability Zone> 
+        <br>
+        <br>
+        Final command should look like below: 
+        <br>
+        <br>
+        aws ec2 create-subnet \ 
+        <br>
+        --vpc-id vpc-0d5f3e369fc1845f6 \
+        <br> 
+        --cidr-block 10.200.2.0/23 \
+        <br> 
+        --availability-zone us-west-2a 
+    </p>
+    <img src="./Images/pic6.png" alt="AWS EC2 connect screenshot">
+    <p>From the output of the command, note the value for SubnetId. You use this 
+        information later for KKCDB Private Subnet 1. 
+        <br>
+        <br>
+        "SubnetId": subnet-08a3a0bf83f9a710e 
+    </p>
+    <p>Next, you create KKCDB Private Subnet 2. This is the extra subnet that is 
+        required to form the database subnet group. It is an empty private subnet 
+        that is defined in a different Availability Zone than the KKCInstance. 
+        <br>
+        <br>
+        Similar to what you did in the previous steps, you must assign a CIDR 
+        address block to the subnet that is within the address range of the VPC 
+        but does not overlap with the address range of any other subnet in the 
+        VPC. So far, you have used the following address ranges: 
+        <br>
+        <br>
+        KKC VPC IPv4 CIDR block: 10.200.0.0/20 
+        KKC Public Subnet 1 IPv4 CIDR block: 10.200.0.0/24 
+        KKC Private Subnet 1 IPv4 CIDR block: 10.200.2.0/23
+        <br>
+        <br> 
+        You use the 10.200.10.0/23 address range for this second private subnet. 
+        <br>
+        <br>
+        For the Availability Zone for the second subnet, you can choose any other 
+        Availability Zone (but not the one ending in a).
+        <br>
+        <br> 
+        To create the second subnet, run the following command. In the command, 
+        replace <KKCInstance VPC ID> with the value of KKCVpcID that you recorded 
+        earlier, and replace <availability-zone> with an Availability Zone that is 
+        different than the one that you used for the first subnet (for example, 
+        us-west-2b).
+    </p>
+    <p>ws ec2 create-subnet \
+        <br>
+         --vpc-id <KKCInstance VPC ID> \
+            <br>
+         --cidr-block 10.200.10.0/23 \ 
+         <br>
+         --availability-zone <availability-zone> 
+            <br>
+            <br>
+        Final command should look like below: 
+        <br>
+        <br>
+        aws ec2 create-subnet \ 
+        <br>
+        --vpc-id vpc-0d5f3e369fc1845f6 \
+        <br> 
+        --cidr-block 10.200.10.0/23 \ 
+        <br>
+        --availability-zone us-west-2b 
+    </p>
+    <img src="./Images/pic7.png" alt="AWS EC2 connect screenshot">
+    <p>From the output of the command, note the value for SubnetId. You use this 
+        information later for KKCDB Private Subnet 2. 
+        <br>
+        <br>
+        "SubnetId": subnet-0b8b9d812debcd063 
+    </p>
+    <p>Next, you create KKCDB Subnet Group. For the Amazon RDS instance for the 
+        café, the DB subnet group consists of the two private subnets that you 
+        created in the previous steps: KKCDB Private Subnet 1 and KKCDB Private 
+        Subnet 2.In the terminal window, run the following command. In the 
+        command, replace <KKC Private Subnet 1 ID> and <KKC Private Subnet 2 ID> 
+        with the subnet ID values that you recorded earlier for each private 
+        subnet. Note that there is a space between the subnet IDs in the command. 
+    </p>
+    <p>ws rds create-db-subnet-group \ 
+        <br>
+        --db-subnet-group-name "KKCDB Subnet Group" \ 
+        <br>
+        --db-subnet-group-description "DB subnet group for KKC" \ 
+        <br>
+        --subnet-ids <KKC Private Subnet 1 ID> <KKC Private Subnet 2 ID> \
+            <br> 
+        --tags "Key=Name,Value= KKCDatabaseSubnetGroup" 
+        <br>
+        <br>
+        Final command should look like below:
+        <br>
+        <br>  
+        aws rds create-db-subnet-group \
+        <br> 
+        --db-subnet-group-name "KKCDB Subnet Group" \ 
+        <br>
+        --db-subnet-group-description "DB subnet group for KKC" \
+        <br> 
+        --subnet-ids subnet-08a3a0bf83f9a710e subnet-0b8b9d812debcd063 \ 
+        <br>
+        --tags "Key=Name,Value= KKCDatabaseSubnetGroup" 
+    </p>
+    <img src="./Images/pic8.png" alt="AWS EC2 connect screenshot">
+
+    <h2>Creating the Amazon RDS MariaDB instance: </h2>
+    <p>You now create the KKCDBInstance that is shown in the final architecture. 
+        Using the AWS CLI, you create an Amazon RDS MariaDB instance with the 
+        following configuration settings:
+        <br> 
+        DB instance identifier: KKCDBInstance 
+        Engine option: mariadb 
+        DB engine version: 80.0.35 
+        DB instance class: db.t3.micro 
+        Allocated storage: 20 GB 
+        Availability Zone: KKCInstanceAZ 
+        DB Subnet group: KKCDB Subnet Group 
+        VPC security groups: KKCDatabaseSG   
+        Public accessibility: No 
+        Username: admin 
+        Password: Kkcmigration!8 
+        <br>
+        <br>
+        These options specify the creation of a Mysql database instance that is 
+        deployed in the same Availability Zone as the KKC instance. The Msql 
+        database instance also uses the DB subnet group that you built in the 
+        previous step. In the terminal window, run the following command. In the 
+        command, replace <KKCInstance Availability Zone> with the KKCInstanceAZ 
+        value that you recorded at the beginning, and replace <KKCDatabaseSG Group 
+        ID> with the value that you recorded in a previous step. 
+        <br>
+        <br>
+        ws rds create-db-instance \ 
+        <br>
+        --db-instance-identifier KKCDBInstance \ 
+        <br>
+        --engine mariadb \ 
+        <br>
+        --engine-version 10.11.6 \ 
+        <br>
+        --db-instance-class db.t3.micro \ 
+        <br>
+        --allocated-storage 20 \ 
+        <br>
+        --availability-zone us-west-2a \ 
+        <br>
+        --db-subnet-group-name "KKCDB Subnet Group" \ 
+        <br>
+        --vpc-security-group-ids sg-0e6615ed661a7146e \ 
+        <br>
+        --no-publicly-accessible \ 
+        <br>
+        --master-username admin --master-user-password 'Kkcmigration!8' 
+    </p>
+    <p>The command immediately returns some information about the database.
+
+    </p>
+    <img src="./Images/pic9.png" alt="AWS EC2 connect screenshot">
+
+    <p>But the database instance might take up to 10 minutes to become available. 
+        Next, you monitor the status of the database instance until it shows a 
+        status of available. To check the status of the database, run the 
+        following command: 
+        <br>
+        <br>
+        aws rds describe-db-instances \ 
+        <br>
+        --db-instance-identifier KKCDBInstance \ 
+        <br> 
+        --query "DBInstances[*].[Endpoint.Address,AvailabilityZone,PreferredBackupWindow,BackupRetentionPe
+         riod,DBInstanceStatus]" 
+    </p>
+    <img src="./Images/pic10.png" alt="AWS EC2 connect screenshot">
+    <p>Wait a few moments, and repeat the command again. The status progressively 
+        changes to backing-up and finally to available. Keep repeating the command 
+        until the status shows available. Then record the value that is returned 
+        for the endpoint address by using the following format: 
+        <br>
+        <br>
+        RDS Instance Database Endpoint Address: kkcdbinstance.c7g4ymqkse7s.us
+        west-2.rds.amazonaws.com 
+        <br>
+        <br>
+        Maria DB created and available can be confirmed on the AWS Management 
+        console.
+    </p>
+    <img src="./Images/pic11.png" alt="AWS management console screenshot">
+    <hr>
+    <hr>
+
+
+    <footer style="background: linear-gradient(300deg, #ff4c8e, #042befe3, #1f011f03);">@2024 all rights reserved</footer>
+
+
+
+
+
+
+
+
+
+    
+</body>
+</html>

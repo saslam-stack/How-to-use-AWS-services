@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building AWS webserver</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<header style="background: linear-gradient(300deg, #ff4c8e, #efe704e3, #06bf0652);">
+    
+    <img src="../shahpic1.jpg" style="float:left;margin-right:0.5rem; height: 70px; width: 60px; border-radius: 50%; text-align: right; font-size: xx-small; border: none; margin: 1em; margin: 0.5em;" alt="Author">
+    <div>Shahzad Aslam <span style="float:right;margin-right:0.5rem">GitHub:   saslam-stack (github.com)</span>
+        <br>
+        
+         AWS Certified Solution Architect Associate <span style="float:right;margin-right:0.5rem">Email: saslam79@hotmail.co.uk</span> <br> AWS Certified Cloud Practitioner <span style="float:right;margin-right:0.5rem">linkedin.com/in/shahzad-aslam-556719190</span><br> HTML, CSS and JavaScript  web development 
+          
+        </div>
+       
+
+    
+</header>
+<body>
+    <h1>How to build VPC and Launch a Web Server on AWS</h1>
+    <hr>
+    
+    <p>Step1: Login to AWS Management Console account and choose your desired 
+        region to build VPC (virtual private cloud).  
+    </p>
+    <img src="./Images/pic1.png" alt="AWS Management Console screenshot">
+    <p>Type and search for VPC in the search bar at the top. Select VPC from the 
+        list. You are now in the Amazon VPC dashboard. You use the Amazon Virtual 
+        Private Cloud (Amazon VPC) service to build your VPC. Choose Create VPC 
+        and Choose VPC and more. In Name tag auto-generation, click auto generate 
+        and write a name e.g. my project, IPv4 CIDR: Enter 10.0.0.0/18, Tenancy 
+        default, Number of Availability Zones = 1, Number of public subnets =1, 
+        Number of private subnets= 1, NAT gateways: Choose in 1 AZ, VPC endpoints: 
+        Choose None. Click create VPC. 
+    </p>
+    <img src="./Images/pic2.png" alt="AWS Management Console screenshot">
+    <p>Make a note of newly created VPC. 
+    </p>
+    <img src="./Images/pic3.png" alt="AWS Management Console screenshot">
+    <p>You will note all VPC resources apart from NACL has a name tag of cloud 
+        migration (See below). 
+    </p>
+    <img src="./Images/pic4.png" alt="AWS Management Console screenshot">
+    <p>You can change NACL name by clicking on the pen icon.</p>
+    <img src="./Images/pic5.png" alt="AWS Management Console screenshot">
+
+    <H2>Create a VPC security group.</H2>
+
+    <P>You need to create a VPC security group, which acts as a virtual firewall 
+        for your instance. When you launch an instance, you associate one or more 
+        security groups with the instance. You can add rules to each security 
+        group that allow traffic to or from its associated instances. 
+        In the left navigation pane, choose Security Groups and Choose Create 
+        security group. Choose SG name e.g. Web Security Group, Description: Enter 
+        Enable HTTP access. VPC: Choose cloud migration-vpc. Add inbound rule, 
+        Type: Choose HTTP. Source: Choose Anywhere IPv4. Choose Create security 
+        group. 
+    </P>
+    <img src="./Images/pic6.png" alt="AWS Management Console screenshot">
+
+    <h2>Launch a web server instance.</h2>
+    <p>You need launch an EC2 instance into the new VPC. You configure the 
+        instance to act as a web server. Search for EC2 in the AWS management 
+        console, click launch an instance. Give your EC2 instance a name e.g. 
+        cloud migration web server. On the Quick Start: Choose Amazon Linux. 
+        Amazon Machine Image (AMI): From dropdown, Choose Amazon Linux 2023 AMI. 
+        In the Instance type section, choose t2.micro (free tier eligible). Create 
+        a new keypair. In the Network settings section, choose Edit and configure 
+        the following options: VPC - required: Choose cloud migration-vpc. Subnet: 
+        Choose cloud migration public subnet. Auto-assign public IP: Choose 
+        Enable. Firewall (security groups): Choose Select existing security group 
+        i.e. web security group. Expand Advanced details, Under User data, copy 
+        and paste the following code. <br>
+        <br> 
+        #!/bin/bash <br>
+        yum update -y <br>
+        yum install httpd -y  <br>
+        systemctl start httpd <br>
+        systemctl enable httpd <br>
+        <br>
+        Choose launch an instance and wait for shows 2/2 checks passed in the Status check Colum.
+    </p>
+    <img src="./Images/pic7.png" alt="AWS Management Console screenshot">
+    <p>Open a new web browser tab, paste the Public IPv4 DNS value, and press 
+        Enter 
+    </p>
+    <p>If successful, the page should look like the following:</p>
+    <img src="./Images/pic8.png" alt="web browser print screenshot">
+    <br>
+    <hr>
+    <footer style="background: linear-gradient(300deg, #ff4c8e, #efe704e3, #06bf0652);">@2024 all rights reserved</footer>
+    <br>
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

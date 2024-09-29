@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor AWS resources</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<header style="background: linear-gradient(300deg, #dfe610af, #106002fa, #0bee84f0);">
+    
+    <img src="../shahpic1.jpg" style="float:left;margin-right:0.5rem; height: 70px; width: 60px; border-radius: 50%; text-align: right; font-size: xx-small; border: none; margin: 0.5em;" alt="Author">
+    <div>Shahzad Aslam <span style="float:right;margin-right:0.5rem">GitHub:   saslam-stack (github.com)</span>
+        <br>
+        
+         AWS Certified Solution Architect Associate <span style="float:right;margin-right:0.5rem">Email: saslam79@hotmail.co.uk</span> <br> AWS Certified Cloud Practitioner <span style="float:right;margin-right:0.5rem">linkedin.com/in/shahzad-aslam-556719190</span><br> HTML, CSS and JavaScript  web development 
+          
+        </div>
+       
+
+    
+</header>
+
+<body>
+    <h1>Monitor an AWS EC2 Instance</h1>
+    <hr>
+    <p>Logging and monitoring are techniques implemented to achieve a common 
+        goal. They work together to help ensure that a system's performance 
+        baselines and security guidelines are always met.  
+        <br>
+        <br>
+        <b>Logging</b> refers to recording and storing data events as log files. Logs 
+        contain low-level details that can give you visibility into how your 
+        application or system performs under certain circumstances. From a 
+        security standpoint, logging helps security administrators identify red 
+        flags that are easily overlooked in their system. 
+        <br>
+        <br>
+        <b>Monitoring</b> is the process of analyzing and collecting data to help ensure 
+        optimal performance. Monitoring helps detect unauthorized access and helps 
+        align your services' usage with organizational security. 
+        <br>
+        <br>
+        You can create an Amazon CloudWatch alarm that initiates when the Amazon 
+        Elastic Compute Cloud (Amazon EC2) instance exceeds a specific central 
+        processing unit (CPU) utilization threshold. You create a subscription 
+        using Amazon Simple Notification Service (Amazon SNS) that sends an email 
+        to you if this alarm is goes off. You log in to the EC2 instance and run a 
+        stress test command that causes the CPU utilization of the EC2 instance to 
+        reach 100 percent. This test simulates a malicious actor gaining control 
+        of the EC2 instance and spiking the CPU. CPU spiking has various possible 
+        causes, one of which is malware. 
+        <br>
+        <br>
+        I have already created a preconfigured EC2 instance named <b>Stress Test</b> with 
+        an attached AWS IAM role that I will use to connect via AWS Systems 
+        Manager session manager.
+    </p>
+    <h2>Step 1: Configure Amazon SNS </h2>
+    <p>You can create an SNS topic and then subscribe to it with an email 
+        address. 
+        <br>
+        <br>
+        Amazon SNS is a fully managed messaging service for both application-to
+        application (A2A) and application-to-person (A2P) communication. 
+        <br>
+        <br>
+        In the AWS Management Console, enter <b>SNS</b> in the search bar, and then 
+        choose <strong>Simple Notification Service.</strong> 
+    </p>
+    <img src="./Images/Pic1.png" alt="AWS Management Console">
+    <p>On the left, choose the button, choose <strong>Topics</strong>, and then choose 
+        <strong>Create topic</strong>. On the <strong>Create topic </strong> page in the Details section, 
+        configure the following options: 
+    </p>
+    <img src="./Images/pic2.png" alt="">
+    <p><b>Type:</b> Choose <b>Standard</b>. In Name: Enter MyCwAlarm, Choose <b>Create topic</b>. On 
+        the <b>MyCwAlarm</b> details page, choose the <b>Subscriptions</b> tab, and then choose 
+       <b>Create subscription</b>. 
+    </p>
+    <p>On the <b>Create subscription</b> page in the <b>Details</b> section, configure 
+        the following options: <b>Topic ARN:</b> Leave the default option selected. 
+        <b>Protocol:</b> From the dropdown list, choose <b>Email. Endpoint:</b>Enter a 
+        valid email address that you can access. Choose <b>Create subscription.</b> 
+        In the <b>Details</b> section, the Status should be Pending confirmation.
+    </p>
+    <img src="./Images/pic4.png" alt="">
+    <p>You should have received an <b>AWS Notification - Subscription Confirmation</b>
+        email message at the email address that you provided in the previous step. 
+        Open the email that you received with the Amazon SNS subscription 
+        notification, and choose <b>Confirm subscription.</b> 
+    </p>
+    <img src="./Images/pic5.png" alt="">
+    <p>Go back to the <b>AWS Management Console</b>. In the left navigation pane, choose 
+        <b>Subscriptions</b>. The <b>Status</b> should now be <b>Confirmed</b>. 
+    </p>
+    <img src="./Images/pic6.png" alt="">
+    <h2>Step 2: Create a CloudWatch alarm </h2>
+    <p>In the AWS Management Console, enter <b>Cloudwatch</b> in the search bar, and 
+        then choose it. 
+    </p>
+    <img src="./Images/pic7.png" alt="">
+    <p>In the left navigation pane, choose the <b>Metrics</b> dropdown list, and then 
+        choose <b>All metrics</b>. CloudWatch usually takes 5-10 minutes after the 
+        creation of an EC2 instance to start fetching metric details. On the 
+        <b>Metrics</b> page, choose <b>EC2</b>, and choose <b>Per-Instance Metrics</b>. From this page, 
+        you can view all the metrics being logged and the specific EC2 instance 
+        for the metrics. Select the check box with <b>CPUUtilization</b> as the <b>Metric 
+        name</b> for the <b>Stress Test</b> EC2 instance. The following image shows the 
+        metrics and instance that you should select. This option displays the 
+        graph for the CPU utilization metric, which should be approximately 0 
+        because nothing has been done yet.
+    </p>
+    <img src="./Images/pic8.png" alt="">
+    <p>In the left navigation pane, choose the <b>Alarms</b>dropdown list, and then 
+        choose <b>All alarms</b>. You now create a metric alarm. A metric alarm watches a 
+        single CloudWatch metric or the result of a math expression based on 
+        CloudWatch metrics. The alarm performs one or more actions based on the 
+        value of the metric or expression relative to a threshold over a number of 
+        time periods. The action then sends a notification to the SNS topic that 
+        you created earlier. 
+    </p>
+    <img src="./Images/pic9.png" alt="">
+    <p>Choose <b>Create alarm</b>. Choose <b>Select metric</b>, choose <b>EC2</b>, and then choose 
+        <b>Per-Instance Metrics</b>. Select the check box with <b>CPUUtilization</b> as the 
+        <b>Metric name</b> for the <b>Stress Test</b> instance name.
+    </p>
+    <img src="./Images/pic10.png" alt="">
+    <p>Choose <b>Select metric</b>. On the <b>Specify metric and conditions</b> page, configure 
+        the following options: 
+        <br>
+        <br>
+        <b>Metric: Metric name:</b> Enter CPUUtilization, <b>InstanceId:</b> Leave the default 
+        option selected. <b>Statistic:</b> Enter Average , <b>Period:</b> From the dropdown 
+        list, choose <b>1 minute.</b> 
+    </p>
+    <img src="./Images/pic11.png" alt="">
+    <p><b>Conditions: Threshold type:</b>  Choose <b>Static</b>. <b>Whenever CPUUtilization</b> is...: 
+        Choose <b>Greater > threshold. than... Define the threshold value:</b> Enter 60
+    </p>
+    <img src="./Images/pic12.png" alt="">
+    <p>Choose <b>Next</b>. On the <b>Configure actions</b> page, configure the following options: 
+        <b>Notification: Alarm state trigger:</b> Choose <b>In alarm</b>. Select an <b>SNS topic:</b> 
+        Choose <b>Select an existing SNS topic</b>. Send a <b>notification to</b>...: Choose the 
+        text box, and then choose <b>MyCwAlarm</b>. 
+    </p>
+    <img src="./Images/pic13.png" alt="">
+    <p>Choose <b>Next</b>, and then configure the following options: 
+        <b>Name and description: Alarm name:</b> Enter CPUUtilizationAlarm . <b>Alarm 
+        description - optional:</b> Enter CloudWatch alarm for Stress Test EC2 
+        instance CPUUtilization . Choose <b>Next</b>
+    </p>
+    <img src="./Images/pic14.png" alt="">
+    <p>Review the <b>Preview and create page</b>, and then choose <b>Create alarm.</b>
+    </p>
+    <img src="./Images/pic15.png" alt="">
+    <h2>Step 3: Test the Cloudwatch alarm </h2>
+    <p>You can log in to the <b>Stress Test</b> EC2 instance and run a command that 
+        stresses the CPU load to 100 percent. This increase in CPU utilization 
+        activates the CloudWatch alarm, which causes Amazon SNS to send an email 
+        notification to the email address associated with the SNS topic. 
+        <br>
+        <br>
+        Navigate to the AWS console EC2 Dashboard, choose running instance and 
+        click on connect.
+    </p>
+    <img src="./Images/pic16.png" alt="">
+    <p>Choose to connect session manager (See AWS documentation for the session 
+        manager agent installation instructions). 
+    </p>
+    <img src="./Images/pic17.png" alt="">
+    <p>To manually increase the CPU load of the EC2 instance, run the following 
+        command: sudo stress --cpu 10 -v --timeout 400s . The output from the 
+        command should look similar to the following image. 
+    </p>
+    <img src="./Images/pic18.png" alt="">
+    <p>This command runs for 400 seconds, loads the CPU to 100 percent, and then 
+        decreases the CPU to 0 percent after the allotted time. It takes a few 
+        minutes for the alarm status to change to In alarm and for an email to 
+        send. On the graph, you can see where <b>CPUUtilization</b> has increased above 
+        the 60 percent threshold. Navigate to your email inbox for the email 
+        address that you used to configure the Amazon SNS subscription. You should 
+        see a new email notification from <b>AWS Notifications</b>. 
+    </p>
+    <img src="./Images/pic19.png" alt="">
+    <h2>Step 4: Create a CloudWatch dashboard </h2>
+    <p>CloudWatch dashboards are customizable home pages in the CloudWatch 
+        console that you can use to monitor your resources in a single view. With 
+        CloudWatch dashboards, you can even monitor resources that are spread 
+        across different Regions. You can use CloudWatch dashboards to create 
+        customized views of the metrics and alarms for your AWS resources. 
+        <br>
+        <br>
+        Go to the CloudWatch section in the AWS console. In the left navigation 
+        pane, choose <b>Dashboards</b>. 
+    </p>
+    <img src="./Images/pic20.png" alt="">
+    <p>Choose <b>Create dashboard</b>. </p>
+    <img src="./Images/pic21.png" alt="">
+    <p>For <b>Dashboard name</b>, enter MyEC2Dashboard and then choose <b>Create dashboard</b>. 
+        Choose <b>Metrics</b>. Choose <b>Line</b>.
+    </p>
+    <img src="./Images/pic22.png" alt="">
+    <p>Choose <b>EC2</b>, and then choose <b>Per-Instance Metrics</b>.</p>
+    <img src="./Images/pic23.png" alt="">
+    <p>Select the check box with <b>Stress Test</b> for the <b>Instance name</b> and 
+        <b>CPUUtilization</b> for the <b>Metric name:</b> Choose <b>Create widget</b>. Choose <b>Save 
+            dashboard</b>. 
+        <br>
+        <br>
+        Now you have created a quick access shortcut to view the <b>CPUUtilization</b> 
+        metric for the <b>Stress Test</b> instance. 
+    </p>
+    <img src="./Images/pic24.png" alt="">
+    <p>Choose <b>Create widget</b>. Choose <b>Save dashboard</b>.     
+    </p>
+    <img src="./Images/pic25.png" alt="">
+    <p>Now you have created a quick access shortcut to view the <b>CPUUtilization</b> 
+        metric for the <b>Stress Test</b> instance.
+    </p>
+    <br>
+    <hr>
+
+<footer style="background: linear-gradient(300deg, #dfe610af, #106002fa, #0bee84f0);">@2024 all rights reserved</footer>
+
+
+
+
+
+
+    
+    
+</body>
+</html>

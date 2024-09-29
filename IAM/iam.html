@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS IAM</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<header style="background: linear-gradient(300deg, #ff4c8e, #042befe3, #cf03cf9c);">
+    
+    <img src="../shahpic1.jpg" style="float:left;margin-right:0.5rem; height: 70px; width: 60px; border-radius: 50%; text-align: right; font-size: xx-small; border: none; margin: 1em; margin: 0.5em;" alt="Author">
+    <div>Shahzad Aslam <span style="float:right;margin-right:0.5rem">GitHub:   saslam-stack (github.com)</span>
+        <br>
+        
+         AWS Certified Solution Architect Associate <span style="float:right;margin-right:0.5rem">Email: saslam79@hotmail.co.uk</span> <br> AWS Certified Cloud Practitioner <span style="float:right;margin-right:0.5rem">linkedin.com/in/shahzad-aslam-556719190</span><br> HTML, CSS and JavaScript  web development 
+          
+        </div>
+       
+
+    
+</header>
+<body>
+    <h1>How to create users, groups and manage permission through AWS Identity and Access Management (IAM)</h1>
+    <hr>
+    <p>In many business environments, access involves a single login to a 
+        computer or a network of computer systems that provides the user access to 
+        all resources on the network. This access includes rights to personal and 
+        shared folders on a network server, company intranets, printers, and other 
+        network resources and devices. Unauthorized users can quickly exploit 
+        these same resources if the access control and associated authentication 
+        procedures are not set up properly. 
+    </p>
+    <h2> AWS IAM (Identity and Access Management) </h2>
+    <p>AWS IAM can be used for the following: </p>
+    <ul>
+        <li>Manage users and their access.</li>
+        <li>Manage roles and their permissions.</li>
+        <li>Manage federated users and their permissions.</li>
+    </ul>
+    <h3>Manage users and their access:</h3>
+    <p> You can create users and assign them 
+        individual security credentials (access keys, passwords, and multi-factor 
+        authentication devices). You can manage permissions to control which 
+        operations a user can perform.
+    </p>
+    <h3>Manage roles and their permissions:</h3>
+    <p>An IAM role is similar to a user 
+        in that a role is an AWS identity with permission policies that determine 
+        what the identity can and cannot do in Amazon Web Services (AWS). However, 
+        instead of being uniquely associated with one person, a role is intended 
+        to be assumable by anyone who needs it.
+    </p>
+    <h3>Manage federated users and their permissions: </h3>
+    <p>You can activate identity 
+        federation to allow existing users in your enterprise to access the AWS 
+        Management Console, to call AWS application programming interfaces (APIs), 
+        and to access resources without the need to create an IAM user for each 
+        identity. 
+    </p>
+    <h2>Create an account password policy.</h2>
+    <p>In this task, you create a custom password policy for your AWS account. 
+        This policy affects all the users associated with the account. 
+    </p>
+    <p>First, note the Region that you are in (for example, London eu-west-2). 
+        The upper-right corner of the console page displays your Region. In the 
+        AWS Management Console, in the search box, enter IAM and select it.
+    </p>
+    <img src="./Images/pic1.png" alt="AWS Management Console Screenshot">
+    <p>In the left navigation pane, choose Account settings. Here you can see the 
+        default password policy that is currently in effect. The company that you 
+        are working for has much stricter requirements, and you need to update 
+        this policy. 
+    </p>
+    <img src="./Images/pic2.png" alt="AWS Management Console Screenshot">
+    <p>Choose Change password policy. Under Select your account password 
+        policy requirements, configure the following options: For Enforce 
+        minimum password length, change 9 to 10 characters. Select every 
+        check box except the check box for Password expiration requires 
+        administrator reset. For Enable password expiration, leave the 
+        default option of 90 days. For Prevent password reuse, leave the 
+        default option of 5 passwords. Choose Save changes. 
+    </p>
+    <img src="./Images/pic3.png" alt="AWS Management Console Screenshot">
+    <h2>Explore users and user groups.</h2>
+    <H3>How to create a user:</H3>
+    <P>In the left navigation pane of the AWS management console, select Users 
+        and click on create user. 
+    </P>
+    <img src="./Images/pic4.png" alt="AWS Management Console Screenshot">
+    <p>Give user a name, click on next to Provide user access to the AWS 
+        Management Console – optional (only if access required). Click radio 
+        button  Autogenerated password and Users must create a new password at 
+        next sign-in – Recommended and click next. In the Permissions options 
+        choose one of radio button Add user to group, Copy permissions or Attach 
+        policies directly and finally cick on Create user.  I have created 3 
+        users. In the left navigation pane, choose Users. The following IAM users 
+        have been created for you: user-1, user-2, user-3
+    </p>
+    <img src="./Images/pic5.png" alt="AWS Management Console Screenshot">
+    <p>Choose user-1. his option bring you to a Summary page for user-1. The 
+        Permissions tab is displayed. Notice that user-1 does not have any 
+        permissions.
+    </p>
+    <img src="./Images/pic6.png" alt="AWS Management Console Screenshot">
+    <p>Choose the Groups tab. user-1 is also is not a member of any user groups. 
+        A user group consists of several users who need access to the same data. 
+        Privileges can be distributed to the entire group of users rather than to 
+        each individual. This option is much more efficient when applying 
+        permissions and provides greater overall control of access to resources 
+        than applying permissions to individuals. 
+    </p>
+    <img src="./Images/pic7.png" alt="AWS Management Console Screenshot">
+    <p>Choose the Security credentials tab. user-1 is assigned a Console 
+        password. 
+    </p>
+    <img src="./Images/pic8.png" alt="AWS Management Console Screenshot">
+
+    <p>In the left navigation pane, choose User groups.The following user groups 
+        have already been created for you: EC2-Admin, EC2-Support, S3-Support 
+    </p>
+    <img src="./Images/pic9.png" alt="">
+    <p>Choose the EC2-Support group. This option brings you to the Summary page 
+        for the EC2-Support group. Choose the Permissions tab. This group has a 
+        managed policy associated with it called AmazonEC2ReadOnlyAccess. Managed 
+        policies are pre-built policies (built either by AWS or by your 
+        administrators) that can be attached to IAM users and user groups. When 
+        the policy is updated, the changes to the policy are immediately applied 
+        to all users and user groups that are attached to the policy. 
+    </p>
+    <img src="./Images/pic10.png" alt="AWS Management Console Screenshot">
+    <p>Next to the AmazonEC2ReadOnlyAccess policy, select the plus sign to show 
+        the policy. A policy defines what actions are allowed or denied for 
+        specific AWS resources. This policy grants permission to list and describe 
+        information about Amazon Elastic Compute Cloud (EC2), Elastic Load 
+        Balancing (ELB), Amazon CloudWatch, and Amazon EC2 Auto Scaling. This 
+        ability to view resources but not modify them is ideal for assigning to a 
+        support role. 
+    </p>
+    <img src="./Images/pic11.png" alt="AWS Management Console Screenshot">
+    <p>The following is the basic structure of the statements in an IAM 
+        policy: Effect indicates whether to Allow or Deny the permissions. 
+        Action specifies the API calls that can be made against an AWS 
+        service (for example, cloudwatch:ListMetrics). Resource defines the 
+        scope of entities covered by the policy rule (for example, a 
+        specific Amazon Simple Storage Service [Amazon S3] bucket, EC2 
+        instance, or * which means any resource). 
+    </p>
+    <img src="./Images/pic12.png" alt="AWS Management Console Screenshot">
+    <h2>How to add user to user groups.</h2>
+    <h3>Add user-1 to the S3-Support group</h3>
+    <p>In the left navigation pane, choose User groups. Choose the S3-Support 
+        group. Choose the Users tab. In the Users tab, choose Add users. 
+    </p>
+    <img src="./Images/pic13.png" alt="AWS Management Console Screenshot">
+    <p>In the Add users to S3-Support window, configure the following options: 
+        Select the check box for user-1. Choose Add Users. In the Users tab, you 
+        see that user-1 has been added to the group.
+    </p>
+    <img src="./Images/pic14.png" alt="AWS Management Console Screenshot">
+    <p>You can Add user-2 to the EC2-Support group and Add user-3 to the EC2
+        Admin group. Each group should have a 1 in the Users column for the number 
+        of users in each group.
+    </p>
+    <h2>Sign in and test user permissions.</h2>
+    <p>You test the permissions of each IAM user. In the left navigation pane of 
+        IAM, choose Dashboard. The AWS Account section includes a Sign-in URL for 
+        IAM users in this account. This link should look similar to the following: <a href=" 
+        https://aws.amazon.com/console/" target="_blank">AWS management console sign in</a>. You can use this link 
+        to sign in to the AWS account that you are currently using. 
+    </p>
+    <img src="./Images/pic15.png" alt="AWS Management Console Screenshot">
+    <p>Copy the Sign-in URL for IAM users in this account to a text editor. Open 
+        a private window (Search google how to open private window). Paste the 
+        Sign-in URL for IAM users in this account into your private window, and 
+        press Enter. 
+    </p>
+    <p>You now sign in as user-1, who has been hired as your Amazon S3 storage 
+        support staff. Sign in using the following credentials: IAM user name: 
+        Enter user-1, Password: Enter Lab-Password1 . Choose Sign in. If you see a 
+        dialog prompting you to switch to the new console home, choose Switch to 
+        the new Console Home. 
+    </p>
+    <img src="./Images/pic16.png" alt="AWS Management Console Screenshot">
+    <p>From the Services menu, choose S3. Choose the name of one of your buckets, 
+        and browse the contents. Because your user is part of the S3-Support group 
+        in IAM, they have permission to view a list of S3 buckets and their 
+        contents. 
+    </p>
+    <img src="./Images/pic17.png" alt="AWS Management Console Screenshot">
+    <p>Now, test whether they have access to Amazon EC2.From the Services menu, 
+        choose EC2. In the left navigation pane, choose Instances. You cannot see 
+        any instances. Instead, you see a message that says, You are not 
+        authorized to perform this operation. This message appears because your 
+        user has not been assigned any permissions to use Amazon EC2.
+    </p>
+    <img src="./Images/pic18.png" alt="AWS Management Console Screenshot">
+    <p>You can now sign in as user-2, and user 3 to check your access in the 
+        same way you did with user 1. User-2 and user 3 have different access. 
+    </p>
+    <br>
+    <hr>
+    <footer style="background: linear-gradient(300deg, #ff4c8e, #042befe3, #1f011f03);">@2024 all rights reserved</footer>
+    
+</body>
+</html>

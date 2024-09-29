@@ -1,0 +1,37 @@
+body {
+   background-color: black;
+   color: white;
+    text-align: justify;
+    margin: 1em 10em 3em 10em;
+    font-size: large;
+    
+    
+}
+footer {
+    background: linear-gradient(300deg, #ff4c8e, #efe304e3, #1f011f03);
+    
+    
+}
+h1 {
+    text-align: center;
+    font-family: 'Times New Roman', Times, serif;
+    margin: 0em;
+}
+img {
+    height: 55px;
+    width: 50px;
+    border-radius: 50%;
+    text-align: right;
+
+}
+header {
+    background: linear-gradient(300deg, #ff4c76, #04d7efe3, #011f1543);
+    font-size: small;
+    
+
+}
+h1 {
+    background: linear-gradient(300deg, #ff4c8e, #efe304e3, #06bd3d63);
+    
+
+}
